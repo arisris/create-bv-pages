@@ -58,9 +58,9 @@ export const defaultOptions: Required<DevServerOptions> = {
 }
 
 export function devServer(options: DevServerOptions = {}): Plugin {
-  if (!("Bun" in globalThis)) {
-    throw new Error(`This Plugin Only Works in Bun`);
-  }
+  // if (!("Bun" in globalThis)) {
+  //   throw new Error(`This Plugin Only Works in Bun`);
+  // }
   let platformProxy: PlatformProxy
   options = { ...defaultOptions, ...options }
   return {
