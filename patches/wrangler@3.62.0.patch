@@ -1,0 +1,12 @@
+diff --git a/wrangler-dist/cli.js b/wrangler-dist/cli.js
+index f82c89400624011ba5488dcceec93070fff46353..04fb8277461abe3236f00f3469b4de2f8f06a180 100644
+--- a/wrangler-dist/cli.js
++++ b/wrangler-dist/cli.js
+@@ -175131,6 +175131,7 @@ var import_update_check = __toESM(require_update_check());
+ async function printWranglerBanner(performUpdateCheck = true) {
+   let text = ` \u26C5\uFE0F wrangler ${version}`;
+   let maybeNewVersion;
++  performUpdateCheck = false
+   if (performUpdateCheck) {
+     maybeNewVersion = await updateCheck();
+     if (maybeNewVersion !== void 0) {

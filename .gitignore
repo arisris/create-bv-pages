@@ -1,0 +1,9 @@
+# path
+node_modules
+dist
+.vscode/.bak
+.wrangler
+
+# file
+.env
+.dev.vars
