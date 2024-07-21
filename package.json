@@ -6,7 +6,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "bun run --bun vite",
-    "build": "bun run --bun vite build && bun run --bun vite build --ssr",
+    "build": "vite build && vite build --ssr",
     "preview": "wrangler pages dev",
     "upload": "wrangler pages deploy --branch preview",
     "clean": "rm -rf node_modules && bun --prefer-offline install"
