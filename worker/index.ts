@@ -7,14 +7,19 @@ export default {
     const url = new URL(req.url)
     if (url.pathname !== "/") {
       return new Response("Not found", {
-        headers: { "content-type": "text/plain" },
+        headers: {
+          "content-type": "text/plain"
+        },
         status: 404
       })
     }
     return new Response(`<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${env.STR_MESSAGE}</title>
+    <meta name="description" content="${env.STR_MESSAGE}" />
   </head>
   <body>
     <h1>${env.STR_MESSAGE}</h1>
@@ -23,7 +28,8 @@ export default {
   </body>
 </html>`, {
       headers: {
-        "Content-Type": "text/html"
+        "Content-Type": "text/html",
+        "Cache-Control": "public, max-age=31536000, immutable"
       }
     })
   }

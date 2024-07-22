@@ -1,38 +1,8 @@
-import { Connect, type Plugin } from "vite"
+import { type Connect, type Plugin } from "vite"
+import { getRequestListener } from "@hono/node-server"
 import { getPlatformProxy, type PlatformProxy } from "wrangler"
 
-export const getHeaders = (req: Connect.IncomingMessage) => {
-  const h = new Headers()
-  for (const [key, value] of Object.entries(req.headers)) {
-    if (value === undefined) continue
-    if (Array.isArray(value)) {
-      for (const v of value) {
-        h.append(key, v)
-      }
-    } else {
-      h.append(key, value)
-    }
-  }
-  return h
-}
-
-export const getBody = async (req: Connect.IncomingMessage) => {
-  let body: BodyInit | undefined
-  if (req.method !== "GET") {
-    body = await new Promise((resolve) => {
-      let b = ""
-      req.on("data", (chunk) => {
-        b += chunk
-      })
-      req.on("end", () => {
-        resolve(b)
-      })
-    })
-  }
-  return body
-}
-
-type DevServerOptions = {
+type HonoDevServerPlugin = {
   entry?: string
   export?: string
   injectClientScript?: boolean
@@ -40,33 +10,53 @@ type DevServerOptions = {
   ignoreWatching?: RegExp[]
 }
 
-export const defaultOptions: Required<DevServerOptions> = {
-  entry: './src/worker.ts',
-  export: 'default',
-  injectClientScript: true,
-  exclude: [
-    /.*\.css$/,
-    /.*\.ts$/,
-    /.*\.tsx$/,
-    /^\/@.+$/,
-    /\?t\=\d+$/,
-    /^\/favicon\.ico$/,
-    /^\/assets\/.+/,
-    /^\/node_modules\/.*/,
-  ],
-  ignoreWatching: [/\.wrangler/, /\.mf/],
-}
-
-export function devServer(options: DevServerOptions = {}): Plugin {
-  // if (!("Bun" in globalThis)) {
-  //   throw new Error(`This Plugin Only Works in Bun`);
-  // }
-  let platformProxy: PlatformProxy
+export default function honoDevServer(options: HonoDevServerPlugin = {}): Plugin {
+  const defaultOptions: Required<HonoDevServerPlugin> = {
+    entry: './src/index.ts',
+    export: 'default',
+    injectClientScript: true,
+    exclude: [
+      /.*\.css$/,
+      /.*\.ts$/,
+      /.*\.tsx$/,
+      /^\/@.+$/,
+      /\?t\=\d+$/,
+      /^\/favicon\.ico$/,
+      /^\/assets\/.+/,
+      /^\/node_modules\/.*/,
+    ],
+    ignoreWatching: [/\.wrangler/, /\.mf/]
+  }
+  const encoder = new TextEncoder();
   options = { ...defaultOptions, ...options }
+  let platformProxy: PlatformProxy
+  const injectStringToResponse = (response: Response, str: string): Response => {
+    if (!response.body) return response;
+    let injectDone = false
+    const transformedStream = response.body
+      .pipeThrough(new TextDecoderStream())
+      .pipeThrough(new TransformStream({
+        async transform(chunk, controller) {
+          if (!injectDone && chunk.includes("</head>")) {
+            chunk = chunk.replace("</head>", `${str}</head>`)
+            injectDone = true
+          }
+          controller.enqueue(encoder.encode(chunk))
+        },
+        flush(controller) {
+          if (!injectDone) {
+            controller.enqueue(encoder.encode(str))
+          }
+          controller.terminate()
+        },
+      }))
+
+    return new Response(transformedStream, response)
+  }
   return {
-    name: "bun-vite:dev-server",
-    apply(_, { command }) {
-      return command === "serve"
+    name: "hono:dev-server",
+    apply(_, env) {
+      return env.command === "serve"
     },
     config(config) {
       return {
@@ -79,72 +69,51 @@ export function devServer(options: DevServerOptions = {}): Plugin {
     async configureServer(server) {
       let logger = server.config.logger
       platformProxy = await getPlatformProxy()
-      server.middlewares.use(async (req, res, next) => {
+      const handler: Connect.NextHandleFunction = async (req, res, next) => {
         if (options.exclude?.some((r) => r.test(req.url!))) {
           return next()
         }
-        let appModule: any;
+        let fetcher: any;
         try {
           const ssrModule = await server.ssrLoadModule(options.entry!, { fixStacktrace: true })
-          if (typeof ssrModule?.default === "object" && typeof ssrModule?.default?.fetch === "function") {
-            appModule = ssrModule.default
+          if (typeof ssrModule?.default !== "object" || typeof ssrModule?.default?.fetch !== "function") {
+            throw new Error("SSR Module is not hono app.")
           } else {
-            throw new Error("Entry must export a default object with a fetch function property");
+            fetcher = ssrModule.default.fetch
           }
-        } catch (error) {
-          return next(error)
+        } catch (e) {
+          return next(e)
         }
-        try {
-          const headers = getHeaders(req)
-          const request = new Request(new URL(req.url!, `http://${req.headers.host}`), {
-            method: req.method,
-            headers,
-            body: await getBody(req)
-          })
+
+        return getRequestListener(async (request) => {
           Object.defineProperty(request, "cf", {
             get: () => platformProxy.cf
           })
-          let response: Response | undefined = await appModule.fetch(request, platformProxy.env, platformProxy.ctx)
-          if (!response || !(response instanceof Response)) {
-            return next(new Error("Invalid response from worker"))
+          let response = await fetcher(request, platformProxy.env, platformProxy.ctx)
+          if (!(response instanceof Response)) {
+            throw response
           }
-          
-          if (options.injectClientScript && response.headers.get("Content-Type")?.match(/^text\/html/)) {
-            // console.log("Injecting client script")
-            const rewriter = new HTMLRewriter()
-            rewriter.on("head", {
-              element(element) {
-                if (options.injectClientScript) {
-                  element.append(
-                    `<script>import("/@vite/client")</script>`,
-                    { html: true }
-                  )
-                }
-              },
-            })
-            response = await Promise.resolve(rewriter.transform(response))
+          if (options.injectClientScript && response.headers.get("content-type")?.includes("text/html")) {
+            response = injectStringToResponse(response, `<script>import("/@vite/client");</script>`)
           }
-          response.headers.forEach((value, key) => {
-            res.setHeader(key, value)
-          })
-          res.statusCode = response.status
-          res.statusMessage = response.statusText
-          const reader = response.body?.getReader()
-          if (!reader) {
-            res.end()
-            return
+          return response
+        }, {
+          overrideGlobalObjects: false,
+          errorHandler: (e) => {
+            let err: Error
+            if (e instanceof Error) {
+              err = e
+              server.ssrFixStacktrace(err)
+            } else if (typeof e === 'string') {
+              err = new Error(`The response is not an instance of "Response", but: ${e}`)
+            } else {
+              err = new Error(`Unknown error: ${e}`)
+            }
+            next(err)
           }
-          while (true) {
-            const { done, value } = await reader.read()
-            if (done) break
-            res.write(value)
-          }
-          res.end()
-          return
-        } catch (error) {
-          return next(error)
-        }
-      })
+        })(req, res)
+      }
+      server.middlewares.use(handler)
       server.httpServer?.on("close", async () => {
         await platformProxy.dispose()
         logger.info("Workerd proxy restarted.", { timestamp: true })
@@ -152,5 +121,3 @@ export function devServer(options: DevServerOptions = {}): Plugin {
     }
   }
 }
-
-export default devServer

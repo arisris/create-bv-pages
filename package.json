@@ -5,7 +5,7 @@
   "description": "Create a new project combination of bun, vite for cloudflare pages project",
   "main": "index.ts",
   "scripts": {
-    "dev": "bun run --bun vite",
+    "dev": "vite",
     "build": "vite build && vite build --ssr",
     "preview": "wrangler pages dev",
     "upload": "wrangler pages deploy --branch preview",
@@ -14,6 +14,7 @@
   "dependencies": {},
   "devDependencies": {
     "@cloudflare/workers-types": "4.20240620.0",
+    "@hono/node-server": "1.12.0",
     "bun-types": "^1.1.20",
     "vite": "5.3.2",
     "wrangler": "3.62.0"
