@@ -4,8 +4,6 @@
     "module": "ESNext",
     "lib": ["ESNext", "DOM"],
     "moduleResolution": "Bundler",
-    // "jsx": "react-jsx",
-    // "jsxImportSource": "hono/jsx",
     "strict": true,
     "alwaysStrict": true,
     "verbatimModuleSyntax": true,
@@ -13,6 +11,7 @@
     "noEmit": true,
     "allowJs": true,
     "esModuleInterop": true,
+    // Add bun types
     "types": ["bun-types"]
   },
   "exclude": ["node_modules", "worker", "client", "dist", ".wrangler"]

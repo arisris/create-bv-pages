@@ -10,49 +10,52 @@ type HonoDevServerPlugin = {
   ignoreWatching?: RegExp[]
 }
 
-export default function honoDevServer(options: HonoDevServerPlugin = {}): Plugin {
-  const defaultOptions: Required<HonoDevServerPlugin> = {
-    entry: './src/index.ts',
-    export: 'default',
-    injectClientScript: true,
-    exclude: [
-      /.*\.css$/,
-      /.*\.ts$/,
-      /.*\.tsx$/,
-      /^\/@.+$/,
-      /\?t\=\d+$/,
-      /^\/favicon\.ico$/,
-      /^\/assets\/.+/,
-      /^\/node_modules\/.*/,
-    ],
-    ignoreWatching: [/\.wrangler/, /\.mf/]
-  }
+const injectStringToResponse = (response: Response, str: string): Response => {
   const encoder = new TextEncoder();
+  if (!response.body) return response;
+  let injectDone = false
+  const transformedStream = response.body
+    .pipeThrough(new TextDecoderStream())
+    .pipeThrough(new TransformStream({
+      async transform(chunk, controller) {
+        const endHeadTag = "</head>"
+        if (!injectDone && chunk.includes(endHeadTag)) {
+          chunk = chunk.replace(endHeadTag, `${str}${endHeadTag}`)
+          injectDone = true
+        }
+        controller.enqueue(encoder.encode(chunk))
+      },
+      flush(controller) {
+        if (!injectDone) {
+          controller.enqueue(encoder.encode(str))
+        }
+        controller.terminate()
+      },
+    }))
+
+  return new Response(transformedStream, response)
+}
+
+const defaultOptions: Required<HonoDevServerPlugin> = {
+  entry: './src/index.ts',
+  export: 'default',
+  injectClientScript: true,
+  exclude: [
+    /.*\.css$/,
+    /.*\.ts$/,
+    /.*\.tsx$/,
+    /^\/@.+$/,
+    /\?t\=\d+$/,
+    /^\/favicon\.ico$/,
+    /^\/assets\/.+/,
+    /^\/node_modules\/.*/,
+  ],
+  ignoreWatching: [/\.wrangler/, /\.mf/]
+}
+
+export default function honoDevServer(options: HonoDevServerPlugin = {}): Plugin {
   options = { ...defaultOptions, ...options }
   let platformProxy: PlatformProxy
-  const injectStringToResponse = (response: Response, str: string): Response => {
-    if (!response.body) return response;
-    let injectDone = false
-    const transformedStream = response.body
-      .pipeThrough(new TextDecoderStream())
-      .pipeThrough(new TransformStream({
-        async transform(chunk, controller) {
-          if (!injectDone && chunk.includes("</head>")) {
-            chunk = chunk.replace("</head>", `${str}</head>`)
-            injectDone = true
-          }
-          controller.enqueue(encoder.encode(chunk))
-        },
-        flush(controller) {
-          if (!injectDone) {
-            controller.enqueue(encoder.encode(str))
-          }
-          controller.terminate()
-        },
-      }))
-
-    return new Response(transformedStream, response)
-  }
   return {
     name: "hono:dev-server",
     apply(_, env) {
@@ -105,7 +108,7 @@ export default function honoDevServer(options: HonoDevServerPlugin = {}): Plugin
               err = e
               server.ssrFixStacktrace(err)
             } else if (typeof e === 'string') {
-              err = new Error(`The response is not an instance of "Response", but: ${e}`)
+              err = new Error(`The response is not an instance of "Response", but: ${e} is passed.`)
             } else {
               err = new Error(`Unknown error: ${e}`)
             }
