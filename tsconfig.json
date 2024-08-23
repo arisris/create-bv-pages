@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleResolution": "Bundler",
     "strict": true,
     "alwaysStrict": true,
@@ -11,8 +11,12 @@
     "noEmit": true,
     "allowJs": true,
     "esModuleInterop": true,
-    // Add bun types
-    "types": ["bun-types"]
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
-  "exclude": ["node_modules", "worker", "client", "dist", ".wrangler"]
+  "include": ["src"]
 }

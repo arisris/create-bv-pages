@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.css": "tailwindcss",
+    "*.json": "jsonc"
+  },
+  "tailwindCSS.classAttributes": ["class", "className"]
+}

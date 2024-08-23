@@ -9,20 +9,33 @@
     "build": "vite build && vite build --ssr",
     "preview": "wrangler pages dev",
     "upload": "wrangler pages deploy --branch preview",
-    "clean": "rm -rf node_modules && bun --prefer-offline install"
+    "clean": "rm -rf dist node_modules && pnpm i --prefer-offline"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@nanostores/query": "^0.3.4",
+    "@nanostores/router": "^0.15.1",
+    "clsx": "^2.1.1",
+    "hono": "^4.5.6",
+    "nanostores": "^0.11.2"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20240620.0",
     "@hono/node-server": "1.12.0",
-    "bun-types": "^1.1.20",
+    "@iconify-json/ri": "^1.1.21",
+    "@iconify/tailwind": "^1.1.1",
+    "@tailwindcss/typography": "^0.5.13",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.4",
     "vite": "5.3.2",
     "wrangler": "3.62.0"
   },
-  "overrides": {
-    "esbuild": "0.21.5"
-  },
-  "patchedDependencies": {
-    "wrangler@3.62.0": "patches/wrangler@3.62.0.patch"
+  "pnpm": {
+    "overrides": {
+      "esbuild": "0.21.5"
+    },
+    "patchedDependencies": {
+      "wrangler@3.62.0": "patches/wrangler@3.62.0.patch"
+    }
   }
 }
