@@ -6,7 +6,7 @@ import plugin from "./vite.plugin";
 export default defineConfig({
   plugins: [
     plugin({
-      clientEntry: ["./src/ui/tailwind.css", "./src/ui/admin/client.tsx"],
+      clientEntry: ["./src/ui/tailwind.css", "./src/ui/admin/index.tsx"],
     }),
   ],
   css: {

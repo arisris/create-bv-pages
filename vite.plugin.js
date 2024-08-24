@@ -64,7 +64,7 @@ const devServerPlugin = (options = {}) => {
               : ["./src/client.tsx", ...options.clientEntry],
             treeshake: {
               preset: "smallest",
-              moduleSideEffects: false,
+              moduleSideEffects: !e.isSsrBuild,
               ...config?.build?.rollupOptions?.treeshake,
             },
           },

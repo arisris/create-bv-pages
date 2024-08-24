@@ -49,7 +49,7 @@ export function useStore<SomeStore extends Store>(store: SomeStore, opts: UseSto
         timer = setTimeout(() => {
           batching = undefined
           forceRender({})
-        })
+        }) as unknown as number
       }
     }
     if (opts.keys) {

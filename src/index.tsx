@@ -18,7 +18,12 @@ app.all("/admin/*", async (c) => {
       title: "Admin App (SPA)",
       slotScripts: (
         <>
-          <script type="module" src={getAsset("src/ui/admin/client.tsx")} />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.initialState = ${JSON.stringify({})}`,
+            }}
+          />
+          <script type="module" src={getAsset("src/ui/admin/index.tsx")} />
         </>
       ),
     }

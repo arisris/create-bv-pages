@@ -1,6 +1,7 @@
 import type { FC, PropsWithChildren } from "hono/jsx";
 import clsx from "clsx";
-import { A, useAdminRouter } from "./router";
+import { useAdminRouter } from "../hooks/admin";
+import { A } from "../components/link";
 
 type MenuItem = {
   href: string;
