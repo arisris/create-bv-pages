@@ -189,7 +189,7 @@ export default (options = {}) => {
           /^\/assets\/.+/,
           /^\/node_modules\/.*/,
         ],
-        ignoreWatching: [/\.wrangler/, /\.mf/, /dist/],
+        ignoreWatching: [/\.wrangler/, /dist/],
       },
       ...options,
     }),
