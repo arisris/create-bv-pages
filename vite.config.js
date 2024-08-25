@@ -6,12 +6,18 @@ import plugin from "./vite.plugin";
 export default defineConfig({
   plugins: [
     plugin({
-      clientEntry: ["./src/ui/tailwind.css", "./src/ui/admin/index.tsx"],
+      clientEntry: ["./src/ui/tailwind.css"],
     }),
   ],
   css: {
     postcss: {
       plugins: [tailwindcss(), autoprefixer()],
     },
+  },
+  ssr: {
+    external: ["cookie"],
+  },
+  server: {
+    port: 3000,
   },
 });

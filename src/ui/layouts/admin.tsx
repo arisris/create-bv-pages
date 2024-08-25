@@ -1,7 +1,5 @@
 import type { FC, PropsWithChildren } from "hono/jsx";
 import clsx from "clsx";
-import { useAdminRouter } from "../hooks/admin";
-import { A } from "../components/link";
 
 type MenuItem = {
   href: string;
@@ -42,12 +40,12 @@ const defaultMenus: MenuItem = [
 const AdminLayout: FC<
   PropsWithChildren<{
     menuItems?: MenuItem;
+    currentPath?: string;
   }>
-> = ({ children, menuItems }) => {
+> = ({ children, menuItems, currentPath }) => {
   const menus = [...defaultMenus, ...(menuItems ?? [])];
-  const { router } = useAdminRouter();
   return (
-    <>
+    <div class="flex absolute inset-0 p-2">
       <input type="checkbox" id="admin-aside" class="hidden peer" />
       <aside class="flex flex-col justify-between whitespace-nowrap overflow-hidden transition-[width] duration-300 ease-in-out w-0 peer-checked:w-56 peer-checked:border-r md:w-56 md:border-r md:peer-checked:w-0 md:peer-checked:border-none">
         <div class="flex items-center gap-2 border-b p-2">
@@ -59,7 +57,7 @@ const AdminLayout: FC<
               {item.submenu ? (
                 <details
                   class="group"
-                  open={router?.path.startsWith(item.href) || item.isActive}
+                  open={currentPath?.startsWith(item.href) || item.isActive}
                 >
                   <summary class="flex items-center gap-x-2 p-2 cursor-pointer select-none hover:bg-neutral-200 group-open:bg-neutral-200 dark:hover:bg-neutral-900 group-open:dark:bg-neutral-900">
                     <span
@@ -79,7 +77,7 @@ const AdminLayout: FC<
                   <ul class="flex flex-col pl-2 my-1">
                     {item.submenu.map(([href, title]) => (
                       <li class="border-l">
-                        <A
+                        <a
                           href={href}
                           class="flex items-center gap-x-2 w-full p-2 hover:rounded hover:bg-neutral-200 dark:hover:bg-neutral-900 text-sm"
                         >
@@ -88,19 +86,19 @@ const AdminLayout: FC<
                             data-inline="false"
                           />
                           <span>{title}</span>
-                        </A>
+                        </a>
                       </li>
                     ))}
                   </ul>
                 </details>
               ) : (
-                <A
+                <a
                   href={item.href}
                   class={clsx(
                     "flex items-center gap-x-2 w-full p-2 hover:rounded hover:bg-neutral-200 dark:hover:bg-neutral-900",
                     {
                       "bg-neutral-200 dark:bg-neutral-900":
-                        item.isActive || router?.path === item.href,
+                        item.isActive || currentPath === item.href,
                     }
                   )}
                 >
@@ -113,25 +111,25 @@ const AdminLayout: FC<
                     data-inline="false"
                   />
                   <span>{item.title}</span>
-                </A>
+                </a>
               )}
             </li>
           ))}
         </menu>
         <div class="flex flex-col gap-y-1 border-t p-2">
-          <A
+          <a
             href="/admin/settings"
             class={clsx(
               "flex items-center gap-x-2 w-full p-2 hover:rounded hover:bg-neutral-200 dark:hover:bg-neutral-900",
               {
                 "bg-neutral-200 dark:bg-neutral-900":
-                  router?.path === "/admin/settings",
+                  currentPath === "/admin/settings",
               }
             )}
           >
             <span class="iconify ri--settings-line w-4 h-4"></span>
             <span>Settings</span>
-          </A>
+          </a>
           <a
             href="/api/auth/signout?redirect_to=/"
             class="flex items-center gap-x-2 w-full p-2 hover:rounded hover:bg-neutral-200 dark:hover:bg-neutral-900"
@@ -157,7 +155,7 @@ const AdminLayout: FC<
       <div class="flex-1 overflow-hidden py-2 px-0 md:px-2 group-has-[input[id=admin-aside]:checked]/admin:px-2 md:group-has-[input[id=admin-aside]:checked]/admin:px-0">
         {children}
       </div>
-    </>
+    </div>
   );
 };
 

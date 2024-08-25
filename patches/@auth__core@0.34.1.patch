@@ -1,0 +1,166 @@
+diff --git a/lib/pages/error.d.ts b/lib/pages/error.d.ts
+index 84b8fdc3a022fb30bc6d56aa4a8e1f38abf24011..e1a90ad524ef4680f9e9c4acfd9e4c090cdf633d 100644
+--- a/lib/pages/error.d.ts
++++ b/lib/pages/error.d.ts
+@@ -12,6 +12,6 @@ export interface ErrorProps {
+ /** Renders an error page. */
+ export default function ErrorPage(props: ErrorProps): {
+     status: number;
+-    html: import("preact").JSX.Element;
++    html: import("hono/jsx").JSX.Element;
+ };
+ //# sourceMappingURL=error.d.ts.map
+\ No newline at end of file
+diff --git a/lib/pages/error.js b/lib/pages/error.js
+index d3b850279cca6cd54ac658d65dd99558823dfbe8..57d9887d38fb8a8f28f78cfadb804eed78bb9541 100644
+--- a/lib/pages/error.js
++++ b/lib/pages/error.js
+@@ -1,4 +1,4 @@
+-import { jsx as _jsx, jsxs as _jsxs } from "preact/jsx-runtime";
++import { jsx as _jsx, jsxs as _jsxs } from "hono/jsx/jsx-runtime";
+ /** Renders an error page. */
+ export default function ErrorPage(props) {
+     const { url, error = "default", theme } = props;
+diff --git a/lib/pages/index.js b/lib/pages/index.js
+index 0ce1972bd1c529938c1c467b9f7a21ea86bdedea..1a496bc32f8a2b481a10aa72d04fe0fde246ef66 100644
+--- a/lib/pages/index.js
++++ b/lib/pages/index.js
+@@ -1,4 +1,4 @@
+-import { renderToString } from "preact-render-to-string";
++// import { renderToString } from "preact-render-to-string";
+ import ErrorPage from "./error.js";
+ import SigninPage from "./signin.js";
+ import SignoutPage from "./signout.js";
+@@ -10,7 +10,7 @@ function send({ html, title, status, cookies, theme, headTags, }) {
+         cookies,
+         status,
+         headers: { "Content-Type": "text/html" },
+-        body: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>${css}</style><title>${title}</title>${headTags ?? ""}</head><body class="__next-auth-theme-${theme?.colorScheme ?? "auto"}"><div class="page">${renderToString(html)}</div></body></html>`,
++        body: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>${css}</style><title>${title}</title>${headTags ?? ""}</head><body class="__next-auth-theme-${theme?.colorScheme ?? "auto"}"><div class="page">${html.toString()}</div></body></html>`,
+     };
+ }
+ /**
+diff --git a/lib/pages/signin.d.ts b/lib/pages/signin.d.ts
+index 980c66b5961210cadf842ec828d4a96a41bc44d8..461c2f2b3550d95d5b0977ab524623dc08afb527 100644
+--- a/lib/pages/signin.d.ts
++++ b/lib/pages/signin.d.ts
+@@ -6,5 +6,5 @@ export default function SigninPage(props: {
+     email?: string;
+     error?: SignInPageErrorParam;
+     theme?: Theme;
+-}): import("preact").JSX.Element;
++}): import("hono/jsx").JSX.Element;
+ //# sourceMappingURL=signin.d.ts.map
+\ No newline at end of file
+diff --git a/lib/pages/signin.js b/lib/pages/signin.js
+index 50d55ecf883349f7ca87aa87e0351cad9972a700..74cb2b2120313a4a7f74359c18b168320e104885 100644
+--- a/lib/pages/signin.js
++++ b/lib/pages/signin.js
+@@ -1,4 +1,4 @@
+-import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "preact/jsx-runtime";
++import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "hono/jsx/jsx-runtime";
+ import { webauthnScript } from "../utils/webauthn-client.js";
+ const signinErrors = {
+     default: "Unable to sign in.",
+diff --git a/lib/pages/signout.d.ts b/lib/pages/signout.d.ts
+index 4f92865a64ba1245f61a3732b64efe543cdfb530..0db1387e9118d2584523e74ac84c88c1dd9f9359 100644
+--- a/lib/pages/signout.d.ts
++++ b/lib/pages/signout.d.ts
+@@ -4,5 +4,5 @@ export interface SignoutProps {
+     csrfToken?: string;
+     theme?: Theme;
+ }
+-export default function SignoutPage(props: SignoutProps): import("preact").JSX.Element;
++export default function SignoutPage(props: SignoutProps): import("hono/jsx").JSX.Element;
+ //# sourceMappingURL=signout.d.ts.map
+\ No newline at end of file
+diff --git a/lib/pages/signout.js b/lib/pages/signout.js
+index 03b05119add4f02b9b3a3f0ad28ad67e2d110cc6..44dc8f15183d5b69f02724058fb7e3a90cd097f1 100644
+--- a/lib/pages/signout.js
++++ b/lib/pages/signout.js
+@@ -1,4 +1,4 @@
+-import { jsx as _jsx, jsxs as _jsxs } from "preact/jsx-runtime";
++import { jsx as _jsx, jsxs as _jsxs } from "hono/jsx/jsx-runtime";
+ export default function SignoutPage(props) {
+     const { url, csrfToken, theme } = props;
+     return (_jsxs("div", { className: "signout", children: [theme?.brandColor && (_jsx("style", { dangerouslySetInnerHTML: {
+diff --git a/lib/pages/verify-request.d.ts b/lib/pages/verify-request.d.ts
+index b4cf30a73e0bf67b272705622e29e4bbd563818c..7ce9f03401af2a6955c66a8f5c510bacab7d4cac 100644
+--- a/lib/pages/verify-request.d.ts
++++ b/lib/pages/verify-request.d.ts
+@@ -3,6 +3,6 @@ interface VerifyRequestPageProps {
+     url: URL;
+     theme: Theme;
+ }
+-export default function VerifyRequestPage(props: VerifyRequestPageProps): import("preact").JSX.Element;
++export default function VerifyRequestPage(props: VerifyRequestPageProps): import("hono/jsx").JSX.Element;
+ export {};
+ //# sourceMappingURL=verify-request.d.ts.map
+\ No newline at end of file
+diff --git a/lib/pages/verify-request.js b/lib/pages/verify-request.js
+index dca43ecb21e54e6ef44585c422350e0988bab6ad..6480f61ede48453148200b852b739f19aaedc356 100644
+--- a/lib/pages/verify-request.js
++++ b/lib/pages/verify-request.js
+@@ -1,4 +1,4 @@
+-import { jsx as _jsx, jsxs as _jsxs } from "preact/jsx-runtime";
++import { jsx as _jsx, jsxs as _jsxs } from "hono/jsx/jsx-runtime";
+ export default function VerifyRequestPage(props) {
+     const { url, theme } = props;
+     return (_jsxs("div", { className: "verify-request", children: [theme.brandColor && (_jsx("style", { dangerouslySetInnerHTML: {
+diff --git a/package.json b/package.json
+index c0e4b0f3d2f93fbcf47afe820b18379a7e1e81e0..e58676ef6cc9134dedf5fc478f890a87c4a70f16 100644
+--- a/package.json
++++ b/package.json
+@@ -72,8 +72,7 @@
+     "cookie": "0.6.0",
+     "jose": "^5.1.3",
+     "oauth4webapi": "^2.10.4",
+-    "preact": "10.11.3",
+-    "preact-render-to-string": "5.2.3"
++    "hono": "^4"
+   },
+   "peerDependencies": {
+     "@simplewebauthn/browser": "^9.0.1",
+diff --git a/providers/credentials.d.ts b/providers/credentials.d.ts
+index 8015809f566426e21ed566520b891a19cd1afd49..d3e1640bfaf2f800845ea2c6f3d71f8d3b7ced54 100644
+--- a/providers/credentials.d.ts
++++ b/providers/credentials.d.ts
+@@ -1,6 +1,6 @@
+ import type { CommonProviderOptions } from "./index.js";
+ import type { Awaitable, User } from "../types.js";
+-import type { JSX } from "preact";
++import type { JSX } from "hono/jsx";
+ /**
+  * Besides providing type safety inside {@link CredentialsConfig.authorize}
+  * it also determines how the credentials input fields will be rendered
+diff --git a/src/lib/pages/index.ts b/src/lib/pages/index.ts
+index 0e83e203fbbff7d4f4acb7bb22144de9aed06b69..f6e42df4e2f49b56c6c53b8ac209f18ac9bdefe3 100644
+--- a/src/lib/pages/index.ts
++++ b/src/lib/pages/index.ts
+@@ -1,4 +1,4 @@
+-import { renderToString } from "preact-render-to-string"
++// import { renderToString } from "preact-render-to-string"
+ import ErrorPage from "./error.js"
+ import SigninPage from "./signin.js"
+ import SignoutPage from "./signout.js"
+@@ -31,7 +31,7 @@ function send({
+       headTags ?? ""
+     }</head><body class="__next-auth-theme-${
+       theme?.colorScheme ?? "auto"
+-    }"><div class="page">${renderToString(html)}</div></body></html>`,
++    }"><div class="page">${html.toString()}</div></body></html>`,
+   }
+ }
+ 
+diff --git a/src/providers/credentials.ts b/src/providers/credentials.ts
+index 1f8a07e2abc03d932ccce9ed4fc81518f9206b47..eaca89023c32e4104b8e3995e744e6e9c3a7e9ac 100644
+--- a/src/providers/credentials.ts
++++ b/src/providers/credentials.ts
+@@ -1,6 +1,6 @@
+ import type { CommonProviderOptions } from "./index.js"
+ import type { Awaitable, User } from "../types.js"
+-import type { JSX } from "preact"
++import type { JSX } from "hono/jsx"
+ 
+ /**
+  * Besides providing type safety inside {@link CredentialsConfig.authorize}

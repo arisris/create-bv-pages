@@ -65,10 +65,10 @@ const AppLayout: FC<
             <a href="/" class="flex flex-col items-center px-2 md:py-2">
               <strong class="block text-xl md:hidden">{"<AR/>"}</strong>
               <strong class="hidden md:block text-2xl underline text-nowrap">
-                {"<arisris />"}
+                {"🔥hono"}
               </strong>
               <span class="hidden md:block text-[.5rem] italic ml-auto -mt-1">
-                Personal Website
+                By Arisris
               </span>
             </a>
             {props.searchForm === true ? (
