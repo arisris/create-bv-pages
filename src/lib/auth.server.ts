@@ -36,7 +36,7 @@ export const getAuthConfig = <E extends Env>(c: Context<E>): Omit<AuthConfig, "r
         }
       })
     ],
-    secret: c.env.AUTH_SECRET,
+    secret: c.env.AUTH_SECRET ?? "not-so-secret-please-provide-in-environment",
     trustHost: true,
     logger: {
       error(_error) {

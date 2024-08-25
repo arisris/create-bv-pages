@@ -45,7 +45,7 @@ const AdminLayout: FC<
 > = ({ children, menuItems, currentPath }) => {
   const menus = [...defaultMenus, ...(menuItems ?? [])];
   return (
-    <div class="flex absolute inset-0 p-2">
+    <div class="flex absolute inset-0 p-2 max-w-screen-lg mx-auto">
       <input type="checkbox" id="admin-aside" class="hidden peer" />
       <aside class="flex flex-col justify-between whitespace-nowrap overflow-hidden transition-[width] duration-300 ease-in-out w-0 peer-checked:w-56 peer-checked:border-r md:w-56 md:border-r md:peer-checked:w-0 md:peer-checked:border-none">
         <div class="flex items-center gap-2 border-b p-2">
