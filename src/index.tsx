@@ -6,7 +6,7 @@ import {
   setupAuthPage,
   onlySignedUser,
   getSession,
-} from "./lib/auth.server";
+} from "./lib/auth";
 import AppLayout from "./ui/layouts/app";
 import AdminLayout from "./ui/layouts/admin";
 import { jsxRenderer, useRequestContext } from "hono/jsx-renderer";

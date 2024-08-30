@@ -14,5 +14,5 @@ STR_MESSAGE = "Hello, From Wrangler!"
 # binding = "KV"
 # id = "<namespace-id>"
 
-[ai]
-binding = "AI"
+# [ai]
+# binding = "AI"

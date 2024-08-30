@@ -32,9 +32,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: 4.20240620.0
         version: 4.20240620.0
-      '@hono/node-server':
-        specifier: 1.12.0
-        version: 1.12.0
+      '@hono/vite-dev-server':
+        specifier: ^0.15.1
+        version: 0.15.1(hono@4.5.6)(miniflare@3.20240620.0)(wrangler@3.62.0(patch_hash=75bera6whqy3p5uqefle5o3jmi)(@cloudflare/workers-types@4.20240620.0))
       '@iconify-json/ri':
         specifier: ^1.1.21
         version: 1.1.21
@@ -276,6 +276,19 @@ packages:
   '@hono/node-server@1.12.0':
     resolution: {integrity: sha512-e6oHjNiErRxsZRZBmc2KucuvY3btlO/XPncIpP2X75bRdTilF9GLjm3NHvKKunpJbbJJj31/FoPTksTf8djAVw==}
     engines: {node: '>=18.14.1'}
+
+  '@hono/vite-dev-server@0.15.1':
+    resolution: {integrity: sha512-9o4Up7zDlBuYLsfz1rN2EdiOxDWgSHoMM248JIZVgZ5mlrdGASBj+gyNWAlQ7pgE/A8UBoLYaXgnbJsW9nxesw==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: '*'
+      miniflare: '*'
+      wrangler: '*'
+    peerDependenciesMeta:
+      miniflare:
+        optional: true
+      wrangler:
+        optional: true
 
   '@iconify-json/ri@1.1.21':
     resolution: {integrity: sha512-ssU2CRaB4T83Q3cncCZtITholhYkH6gEL5XLmdMII6Xzn8bTCpDCkt+HdX4URc24uUMD0PGIaNLJUIAgdfLMjQ==}
@@ -1228,6 +1241,15 @@ snapshots:
   '@fastify/busboy@2.1.1': {}
 
   '@hono/node-server@1.12.0': {}
+
+  '@hono/vite-dev-server@0.15.1(hono@4.5.6)(miniflare@3.20240620.0)(wrangler@3.62.0(patch_hash=75bera6whqy3p5uqefle5o3jmi)(@cloudflare/workers-types@4.20240620.0))':
+    dependencies:
+      '@hono/node-server': 1.12.0
+      hono: 4.5.6
+      minimatch: 9.0.5
+    optionalDependencies:
+      miniflare: 3.20240620.0
+      wrangler: 3.62.0(patch_hash=75bera6whqy3p5uqefle5o3jmi)(@cloudflare/workers-types@4.20240620.0)
 
   '@iconify-json/ri@1.1.21':
     dependencies:

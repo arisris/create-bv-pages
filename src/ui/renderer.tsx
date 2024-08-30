@@ -39,7 +39,7 @@ export const createRootRenderer = (
           </head>
           <body {...(props.bodyProps ?? {})}>
             {children}
-            <script type="module" src={getAsset("src/client.tsx")} />
+            <script type="module" src={getAsset("src/ui/client.ts")} />
             {props.slotScripts}
           </body>
         </html>

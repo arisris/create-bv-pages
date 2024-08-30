@@ -5,5 +5,5 @@
     ".dev.vars*": "ini",
     ".env*": "ini"
   },
-  "tailwindCSS.classAttributes": ["class", "className", "**Class"]
+  "tailwindCSS.classAttributes": ["class", "className", "classList"]
 }
