@@ -1,8 +1,11 @@
 import { type JSX, type Child } from "hono/jsx";
 import { jsxRenderer } from "hono/jsx-renderer";
-import { getDarkModeScript, getAsset } from "@/lib/util";
+import type { Env, Input, Handler, Context } from "hono";
+import type { BlankInput } from "hono/types";
+import type { HtmlEscapedString } from "hono/utils/html";
 
 type RendererProps = {
+  lang?: string;
   bodyProps?: JSX.IntrinsicElements["body"];
   slotScripts?: Child;
   headTags?: Child;
@@ -22,7 +25,7 @@ export const createRootRenderer = (
   return jsxRenderer(
     ({ children, ...props }) => {
       return (
-        <html lang="en">
+        <html lang={props.lang ?? "en"}>
           <head>
             <meta charset="utf-8" />
             <meta
@@ -33,13 +36,10 @@ export const createRootRenderer = (
             {props.description && (
               <meta name="description" content={props.description} />
             )}
-            <link rel="stylesheet" href={getAsset("src/ui/tailwind.css")} />
             {props.headTags}
-            <script dangerouslySetInnerHTML={{ __html: getDarkModeScript() }} />
           </head>
           <body {...(props.bodyProps ?? {})}>
             {children}
-            <script type="module" src={getAsset("src/ui/client.ts")} />
             {props.slotScripts}
           </body>
         </html>
@@ -48,3 +48,33 @@ export const createRootRenderer = (
     { stream: true, docType: true, ...options }
   );
 };
+
+export type PageMeta =
+  | ((ctx: Context) => RendererProps | Promise<RendererProps>)
+  | RendererProps;
+type PageComponent<
+  Params extends Record<string, unknown> = Record<string, unknown>
+> = (props: {
+  params: Params;
+}) => HtmlEscapedString | Promise<HtmlEscapedString>;
+
+interface Page {
+  meta?: PageMeta;
+  default: PageComponent;
+}
+
+export const renderPage =
+  <E extends Env = any, P extends string = any, I extends Input = BlankInput>(
+    pageModule: () => Promise<Page> | Page
+  ): Handler<E, P, I> =>
+  async (ctx, _next) => {
+    const page = await pageModule();
+    let rendererProps: RendererProps = {};
+    if (typeof page.meta === "object") {
+      rendererProps = page.meta;
+    } else if (typeof page.meta === "function") {
+      rendererProps = await page.meta(ctx);
+    }
+    const Page = page.default;
+    return ctx.render(<Page params={ctx.req.param()} />, rendererProps);
+  };

@@ -17,7 +17,7 @@ export const getAuthConfig = <E extends Env>(c: Context<E>): Omit<AuthConfig, "r
             type: "text",
             placeholder: "admin",
           },
-          password: { label: "Password", type: "password" },
+          password: { label: "Password", type: "password", placeholder: "password" },
         },
         async authorize(credentials) {
           const userEnv: string = c.env.AUTH_USER || "admin:password"

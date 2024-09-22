@@ -102,7 +102,7 @@ const AppLayout: FC<
             </label>
           </div>
           <input id="nav-toggle" type="checkbox" class="hidden peer" />
-          <div class="flex flex-col md:flex-row gap-4 bg-inherit md:px-4 transition-[height] duration-300 h-0 peer-checked:h-[92vh] md:h-auto md:peer-checked:checked:h-auto max-md:overflow-hidden">
+          <div class="flex flex-col md:flex-row gap-4 bg-inherit md:px-4 transition-[height] duration-300 h-0 peer-checked:h-64 md:h-auto md:peer-checked:checked:h-auto max-md:overflow-hidden">
             <ul class="flex flex-col md:flex-row">
               {menuItems.map((item) =>
                 item.submenu ? (
@@ -165,7 +165,7 @@ const AppLayout: FC<
                 href="https://github.com/arisris/arisris.com"
                 class="hover:underline"
               >
-                Aris Riswanto
+                CF
               </a>
             </div>
             <div class="flex items-center gap-x-4">
